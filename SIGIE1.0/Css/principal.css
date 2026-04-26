@@ -1,0 +1,438 @@
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 50%, #5DADE2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  /* Decoración de fondo */
+  body::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    top: -200px; left: -200px;
+    z-index: -999;
+  }
+  body::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    bottom: -150px; right: -150px;
+    z-index: -999;
+  }
+
+  /* Selector de vista */
+  .view-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(12px);
+    padding: 8px;
+    border-radius: 32px;
+    display: flex;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  }
+
+  .view-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .view-btn:hover {
+    background: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+  }
+
+  .view-btn.active {
+    background: rgba(255,255,255,0.28);
+    border-color: rgba(255,255,255,0.32);
+  }
+
+  /* Contenedor principal */
+  .login-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    overflow: hidden;
+    z-index: 10;
+  }
+
+  .login-container.hide-brand .brand-side {
+    display: none;
+  }
+
+  .login-container.hide-brand .form-side {
+    flex: 1;
+  }
+
+  /* Lado izquierdo (marca) */
+  .brand-side {
+    flex: 1;
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%);
+    color: white;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-side::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    top: -100px; right: -100px;
+  } 
+  
+  .brand-top { position: relative; z-index: 1; }
+  .brand-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+  .brand-logo-icon {
+    width: 52px; height: 52px;
+    background: white;
+    color: #1F4E79;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+  .brand-logo-text { font-size: 28px; font-weight: bold; letter-spacing: 1px; }
+  .brand-logo-text small {
+    display: block;
+    font-size: 11px;
+    font-weight: normal;
+    opacity: 0.9;
+    letter-spacing: 0;
+  }  
+  
+  .brand-welcome img {
+    display: block;
+    margin: 20px 0;
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .brand-welcome h1 {
+    font-size: 30px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .brand-welcome img {
+    display: block;
+    margin: 20px auto;
+     background: white;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  width: 140px;
+  height: 140px;
+  object-fit: contain;
+  }
+
+  .brand-welcome h5 {
+    font-size: 18px;
+    margin-bottom: 14px;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .brand-welcome p {
+    font-size: 14px;
+    opacity: 0.9;
+    line-height: 1.6;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-features {
+    position: relative;
+    z-index: 1;
+    margin-top: 30px;
+  }
+  .feature-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+  .feature-icon {
+    width: 28px; height: 28px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .brand-footer {
+    font-size: 11px;
+    opacity: 0.7;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 16px;
+  }
+
+  /* Lado derecho (formulario) */
+  .form-side {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .form-header { margin-bottom: 24px; }
+  .form-title {
+    font-size: 24px;
+    color: #1F4E79;
+    margin-bottom: 6px;
+  }
+  .form-subtitle {
+    color: #7f8c8d;
+    font-size: 13px;
+  }
+
+  .form-view { display: none; }
+  .form-view.active { display: block; }
+
+  .form-group {
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-label .req { color: #e74c3c; }
+
+  .input-wrapper { position: relative; }
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #95a5a6;
+    pointer-events: none;
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 14px 12px 44px;
+    border: 1.5px solid #dcdfe3;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f8fafc;
+    transition: all 0.2s;
+  }
+  .form-input:focus {
+    outline: none;
+    border-color: #2E75B6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(46,117,182,0.12);
+  }
+  .form-input.error {
+    border-color: #e74c3c;
+    background: #fff5f5;
+  }
+
+  .form-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #dcdfe3;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #f8fafc;
+    color: #2c3e50;
+    appearance: none;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .form-group select:focus {
+    border-color: #2E75B6;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(46,117,182,0.12);
+  }
+  .toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #95a5a6;
+  }
+
+  .error-msg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff5f5;
+    border-left: 3px solid #e74c3c;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #c0392b;
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .remember {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #34495e;
+    cursor: pointer;
+  }
+  .remember input {
+    width: 16px; height: 16px;
+    cursor: pointer;
+  }
+  .forgot-link {
+    color: #2E75B6;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .forgot-link:hover { text-decoration: underline; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: linear-gradient(135deg, #2E75B6 0%, #1F4E79 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46,117,182,0.4);
+  }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 13px;
+    background: white;
+    color: #2E75B6;
+    border: 1.5px solid #2E75B6;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  .btn-secondary:hover { background: #e3f2fd; }
+
+  .form-back {
+    margin-bottom: 18px;
+  }
+
+  .register-link {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: #7f8c8d;
+  }
+  .register-link a {
+    color: #2E75B6;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .role-info {
+    background: #e3f2fd;
+    border-left: 3px solid #2E75B6;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-top: 16px;
+    font-size: 12px;
+    color: #1F4E79;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Selector de rol en registro */
+  .role-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .role-option {
+    padding: 10px 12px;
+    border: 1.5px solid #dcdfe3;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 12px;
+    background: white;
+  }
+  .role-option:hover { border-color: #2E75B6; }
+  .role-option.active {
+    border-color: #2E75B6;
+    background: #e3f2fd;
+    color: #1F4E79;
+    font-weight: 600;
+  }

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIGIE - Registro</title>
+  <link rel="icon" href="Assets/logo-sigie1.png" type="image/x-icon" />
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header></header>
+
+    <!-- VISTA 2: ERROR DE CREDENCIALES -->
+    <div class="form-view" id="view-error">
+      <div class="form-header">
+        <h2 class="form-title">Iniciar sesión 🔐</h2>
+        <p class="form-subtitle">Ingresa tus credenciales para acceder</p>
+      </div>
+
+      <div class="error-msg">
+        <span style="font-size:16px;">⚠️</span>
+        <div>
+          <strong>Credenciales incorrectas.</strong><br>
+          <span style="font-size:12px;">Verifica tu correo y contraseña. Intento 1 de 5.</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Correo electrónico <span class="req">*</span></label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input type="email" class="form-input error" value="maria.lopez@sigie.mx">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contraseña <span class="req">*</span></label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input type="password" class="form-input error" value="••••••••" id="pass2">
+          <button type="button" class="toggle-password" onclick="togglePass('pass2')">👁️</button>
+        </div>
+      </div>
+
+      <div class="form-options">
+        <label class="remember">
+          <input type="checkbox"> Recordarme
+        </label>
+        <a class="forgot-link" onclick="showView('forgot', null)">¿Olvidaste tu contraseña?</a>
+      </div>
+
+      <button class="btn-submit">🔄 Intentar de nuevo</button>
+    </div>

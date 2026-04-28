@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SIGIE - Panel del Administrador</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f4f8; color: #2c3e50; }
+
+  .header {
+    background: linear-gradient(135deg, #37474f 0%, #546e7a 100%);
+    color: white; padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: bold; }
+  .logo-icon {
+    background: white; color: #37474f;
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .user-info { display: flex; align-items: center; gap: 14px; }
+  .user-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #263238; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px;
+  }
+  .user-role { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+  .btn-logout {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+
+  .container { display: flex; min-height: calc(100vh - 70px); }
+  .sidebar { width: 240px; background: #2c3e50; color: white; padding: 20px 0; flex-shrink: 0; }
+  .sidebar-title { padding: 0 20px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; }
+  .menu-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-size: 14px; border-left: 3px solid transparent; color: #ecf0f1; }
+  .menu-item:hover { background: #34495e; }
+  .menu-item.active { background: #34495e; border-left-color: #546e7a; color: #90a4ae; font-weight: 600; }
+  .menu-icon { font-size: 18px; width: 22px; text-align: center; }
+
+  .main { flex: 1; padding: 28px; }
+  .breadcrumb { font-size: 13px; color: #7f8c8d; margin-bottom: 8px; }
+  .page-title { font-size: 26px; color: #37474f; margin-bottom: 4px; }
+  .page-subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 24px; }
+
+  .panel-selector { background: white; padding: 16px 24px; border-radius: 10px; margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .panel-selector strong { color: #37474f; margin-right: 8px; }
+  .panel-tab { padding: 8px 14px; border-radius: 20px; background: #ecf0f1; cursor: pointer; font-size: 13px; }
+  .panel-tab.active { background: #546e7a; color: white; }
+
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+
+  .card { background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden; }
+  .card-header { padding: 18px 24px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+  .card-title { font-size: 16px; color: #37474f; font-weight: 600; }
+  .card-body { padding: 24px; }
+
+  .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn-primary { background: #546e7a; color: white; }
+  .btn-warning { background: #f39c12; color: white; }
+  .btn-secondary { background: #ecf0f1; color: #2c3e50; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f8fafc; padding: 12px 16px; text-align: left; font-size: 12px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #ecf0f1; }
+  td { padding: 14px 16px; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+
+  .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .badge-activo { background: #e8f5e9; color: #27ae60; }
+  .badge-inactivo { background: #ecf0f1; color: #7f8c8d; }
+  .badge-bloqueado { background: #fee; color: #e74c3c; }
+
+  .action-icons { display: flex; gap: 6px; }
+  .icon-btn { width: 30px; height: 30px; border-radius: 6px; border: none; background: #ecf0f1; font-size: 14px; cursor: pointer; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
+  .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .stat-icon.blue { background: #e3f2fd; color: #2E75B6; }
+  .stat-icon.orange { background: #fef3e6; color: #f39c12; }
+  .stat-icon.green { background: #e8f5e9; color: #27ae60; }
+  .stat-icon.purple { background: #f3e8ff; color: #8e44ad; }
+  .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+  .stat-label { font-size: 12px; color: #7f8c8d; }
+
+  .search-box { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; min-width: 220px; }
+
+  .log-item { display: flex; gap: 14px; padding: 12px 14px; border-bottom: 1px solid #ecf0f1; font-family: 'Courier New', monospace; font-size: 12px; }
+  .log-time { color: #7f8c8d; min-width: 140px; }
+  .log-user { color: #2E75B6; font-weight: bold; min-width: 140px; }
+  .log-action { flex: 1; }
+  .log-tag { padding: 2px 8px; border-radius: 8px; font-size: 10px; font-weight: bold; margin-right: 6px; }
+  .log-tag.create { background: #e8f5e9; color: #27ae60; }
+  .log-tag.update { background: #fef3e6; color: #e67e22; }
+  .log-tag.delete { background: #fee; color: #e74c3c; }
+  .log-tag.login { background: #e3f2fd; color: #2E75B6; }
+
+  .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .info-box { background: #f8fafc; padding: 14px; border-radius: 8px; border-left: 3px solid #546e7a; }
+  .info-box-label { font-size: 11px; color: #7f8c8d; text-transform: uppercase; margin-bottom: 4px; }
+  .info-box-value { font-size: 15px; font-weight: 600; color: #2c3e50; }
+  .info-box.success { border-left-color: #27ae60; }
+  .info-box.warning { border-left-color: #f39c12; }
+</style>
+</head>
+<body>
+    <div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>SIGIE<div style="font-size:11px;font-weight:normal;opacity:0.8;">Sistema de Gestión de Incidentes Escolares</div></div>
+  </div>
+  <div class="user-info">
+    <span class="user-role">⚙️ Administrador</span>
+    <div style="text-align:right;">
+      <div style="font-weight:600;font-size:14px;">Ing. Elena Vargas</div>
+      <div style="font-size:11px;opacity:0.8;">Admin. del Sistema</div>
+    </div>
+    <div class="user-avatar">EV</div>
+    <button class="btn-logout">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="sidebar-title">Administración</div>
+    <div class="menu-item" onclick="show('dashboard')"><span class="menu-icon">📊</span> Panel admin</div>
+    <div class="menu-item" onclick="show('usuarios')"><span class="menu-icon">👥</span> Gestión usuarios</div>
+    <div class="menu-item" onclick="show('auditoria')"><span class="menu-icon">📋</span> Auditoría</div>
+    <div class="menu-item" onclick="show('respaldo')"><span class="menu-icon">💾</span> Respaldos</div>
+  </div>
+
+  <div class="main">
+    <div class="panel-selector">
+      <strong>Ver panel:</strong>
+      <span class="panel-tab active" onclick="show('dashboard')">📊 Dashboard</span>
+      <span class="panel-tab" onclick="show('usuarios')">👥 Usuarios</span>
+      <span class="panel-tab" onclick="show('auditoria')">📋 Auditoría</span>
+      <span class="panel-tab" onclick="show('respaldo')">💾 Respaldo</span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="panel-content active" id="dashboard">
+      <h1 class="page-title">⚙️ Panel de Administración</h1>
+      <p class="page-subtitle">Monitoreo y gestión del sistema</p>
+
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-number">52</div><div class="stat-label">Usuarios activos</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">💤</div><div><div class="stat-number">8</div><div class="stat-label">Inactivos</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">💾</div><div><div class="stat-number">✓</div><div class="stat-label">Respaldo hoy</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">📊</div><div><div class="stat-number">99.8%</div><div class="stat-label">Disponibilidad</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🖥️ Estado del sistema</div></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-box success"><div class="info-box-label">🖥️ Servidor web</div><div class="info-box-value">● Operativo</div></div>
+            <div class="info-box success"><div class="info-box-label">💾 Base de datos</div><div class="info-box-value">● Operativo</div></div>
+            <div class="info-box success"><div class="info-box-label">📧 SMTP</div><div class="info-box-value">● Operativo</div></div>
+            <div class="info-box warning"><div class="info-box-label">⚠️ Almacenamiento</div><div class="info-box-value">78% usado</div></div>
+            <div class="info-box"><div class="info-box-label">⏱️ Uptime</div><div class="info-box-value">47 días</div></div>
+            <div class="info-box"><div class="info-box-label">🔄 Versión</div><div class="info-box-value">v2.4.1</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USUARIOS -->
+    <div class="panel-content" id="usuarios">
+      <h1 class="page-title">👥 Gestión de usuarios</h1>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Usuarios registrados (52)</div>
+          <div style="display:flex;gap:10px;">
+            <input class="search-box" placeholder="🔍 Buscar...">
+            <button class="btn btn-primary">➕ Nuevo usuario</button>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Última sesión</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr><td><strong>María López</strong></td><td>maria.lopez@sigie.mx</td><td>Enfermera</td><td>Hoy 10:30</td><td><span class="badge badge-activo">Activo</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔒</button></div></td></tr>
+            <tr><td><strong>Carlos Jiménez</strong></td><td>c.jimenez@sigie.mx</td><td>Docente</td><td>Hoy 09:15</td><td><span class="badge badge-activo">Activo</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔒</button></div></td></tr>
+            <tr><td><strong>Roberto Sánchez</strong></td><td>r.sanchez@sigie.mx</td><td>Director</td><td>Ayer</td><td><span class="badge badge-activo">Activo</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔒</button></div></td></tr>
+            <tr><td><strong>Luis Ramírez</strong></td><td>luis.ramirez@correo.com</td><td>Tutor</td><td>Hoy 11:00</td><td><span class="badge badge-activo">Activo</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔒</button></div></td></tr>
+            <tr><td><strong>Ana Martínez</strong></td><td>a.martinez@correo.com</td><td>Tutor</td><td>Hace 45 días</td><td><span class="badge badge-inactivo">Inactivo</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔒</button></div></td></tr>
+            <tr><td><strong>Pedro Gómez</strong></td><td>p.gomez@correo.com</td><td>Tutor</td><td>Hace 60 días</td><td><span class="badge badge-bloqueado">Bloqueado</span></td><td><div class="action-icons"><button class="icon-btn">✏️</button><button class="icon-btn">🔓</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUDITORÍA -->
+    <div class="panel-content" id="auditoria">
+      <h1 class="page-title">📋 Registro de auditoría</h1>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔍 Log de acciones críticas</div>
+          <button class="btn btn-secondary">📥 Exportar</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="log-item"><span class="log-time">23/04 10:30</span><span class="log-user">María López</span><span class="log-action"><span class="log-tag update">MODIFICAR</span>INC-0453 · actualizó etapa · IP 192.168.1.45</span></div>
+          <div class="log-item"><span class="log-time">23/04 10:15</span><span class="log-user">María López</span><span class="log-action"><span class="log-tag create">CREAR</span>Registró incidencia INC-0453 · IP 192.168.1.45</span></div>
+          <div class="log-item"><span class="log-time">23/04 09:42</span><span class="log-user">Carlos Jiménez</span><span class="log-action"><span class="log-tag login">LOGIN</span>Inicio de sesión · IP 192.168.1.52</span></div>
+          <div class="log-item"><span class="log-time">23/04 09:15</span><span class="log-user">Elena Vargas</span><span class="log-action"><span class="log-tag update">MODIFICAR</span>Permisos del rol "Docente" actualizados</span></div>
+          <div class="log-item"><span class="log-time">22/04 16:45</span><span class="log-user">Roberto Sánchez</span><span class="log-action"><span class="log-tag delete">ELIMINAR</span>Eliminó INC-0398 (alumno egresado)</span></div>
+          <div class="log-item"><span class="log-time">22/04 11:20</span><span class="log-user">Sistema</span><span class="log-action"><span class="log-tag update">SISTEMA</span>Respaldo automático completado · 847 MB</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESPALDO -->
+    <div class="panel-content" id="respaldo">
+      <h1 class="page-title">💾 Gestión de respaldos</h1>
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚙️ Configuración de respaldos</div></div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-box success"><div class="info-box-label">Frecuencia</div><div class="info-box-value">Diaria (02:00 AM)</div></div>
+            <div class="info-box"><div class="info-box-label">Último respaldo</div><div class="info-box-value">Hoy 02:00 · 847 MB ✅</div></div>
+            <div class="info-box"><div class="info-box-label">Próximo</div><div class="info-box-value">Mañana 02:00</div></div>
+          </div>
+          <div style="margin-top:20px;display:flex;gap:10px;">
+            <button class="btn btn-primary">💾 Crear respaldo manual</button>
+            <button class="btn btn-warning">🔄 Restaurar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📂 Historial de respaldos</div></div>
+        <table>
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Tamaño</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr><td>23/04/2026 02:00</td><td>Automático</td><td>847 MB</td><td><span class="badge badge-activo">✅ Completado</span></td><td><div class="action-icons"><button class="icon-btn">📥</button></div></td></tr>
+            <tr><td>22/04/2026 02:00</td><td>Automático</td><td>843 MB</td><td><span class="badge badge-activo">✅ Completado</span></td><td><div class="action-icons"><button class="icon-btn">📥</button></div></td></tr>
+            <tr><td>21/04/2026 14:30</td><td>Manual</td><td>841 MB</td><td><span class="badge badge-activo">✅ Completado</span></td><td><div class="action-icons"><button class="icon-btn">📥</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel-content').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.panel-tab').forEach(el => el.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>

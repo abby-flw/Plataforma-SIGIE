@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SIGIE - Panel de Enfermería Completo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f4f8; color: #2c3e50; }
+ 
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%);
+    color: white;
+    padding: 14px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 22px;
+    font-weight: bold;
+  }
+  .logo-icon {
+    background: white;
+    color: #1F4E79;
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .user-info { display: flex; align-items: center; gap: 14px; }
+  .user-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: #e74c3c;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px;
+  }
+  .user-role {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+  }
+  .btn-logout {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+ 
+  /* ===== LAYOUT ===== */
+  .container { display: flex; min-height: calc(100vh - 70px); }
+ 
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 240px;
+    background: #2c3e50;
+    color: white;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .sidebar-title {
+    padding: 0 20px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #95a5a6;
+  }
+  .menu-item {
+    padding: 12px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+    color: #ecf0f1;
+  }
+  .menu-item:hover { background: #34495e; }
+  .menu-item.active {
+    background: #34495e;
+    border-left-color: #2E75B6;
+    color: #5DADE2;
+    font-weight: 600;
+  }
+  .menu-icon { font-size: 18px; width: 22px; text-align: center; }
+ 
+  /* ===== MAIN ===== */
+  .main { flex: 1; padding: 28px; overflow-y: auto; }
+ 
+  .breadcrumb {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-bottom: 8px;
+  }
+  .page-title {
+    font-size: 26px;
+    color: #1F4E79;
+    margin-bottom: 4px;
+  }
+  .page-subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+ 
+  /* ===== SELECTOR DE PANEL ===== */
+  .panel-selector {
+    background: white;
+    padding: 16px 24px;
+    border-radius: 10px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .panel-selector strong {
+    color: #1F4E79;
+    margin-right: 8px;
+  }
+  .panel-tab {
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: #ecf0f1;
+    cursor: pointer;
+    font-size: 13px;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .panel-tab:hover { background: #d5dbdb; }
+  .panel-tab.active {
+    background: #2E75B6;
+    color: white;
+  }
+ 
+  /* Ocultar todos los paneles por defecto */
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+ 
+  /* ===== PANELES COMUNES ===== */
+  .card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .card-title {
+    font-size: 16px;
+    color: #1F4E79;
+    font-weight: 600;
+  }
+  .card-body { padding: 24px; }
+ 
+  /* ===== FORMULARIOS ===== */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .form-grid-full {
+    grid-column: 1 / -1;
+  }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 6px;
+  }
+  .form-label .req { color: #e74c3c; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #dcdfe3;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #2E75B6;
+    box-shadow: 0 0 0 3px rgba(46,117,182,0.1);
+  }
+  .form-textarea { min-height: 100px; resize: vertical; }
+  .form-help {
+    font-size: 11px;
+    color: #95a5a6;
+    margin-top: 4px;
+  }
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    padding-top: 20px;
+    border-top: 1px solid #ecf0f1;
+    margin-top: 20px;
+  }
+  .btn {
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: #2E75B6; color: white; }
+  .btn-primary:hover { background: #1F4E79; }
+  .btn-success { background: #27ae60; color: white; }
+  .btn-danger { background: #e74c3c; color: white; }
+  .btn-secondary { background: #ecf0f1; color: #2c3e50; }
+  .btn-secondary:hover { background: #d5dbdb; }
+ 
+  /* ===== TABLAS ===== */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #f8fafc;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    color: #7f8c8d;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #ecf0f1;
+  }
+  td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #ecf0f1;
+    font-size: 14px;
+  }
+  tr:hover { background: #f8fafc; }
+ 
+  .folio {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #2E75B6;
+  }
+  .badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .badge-proceso { background: #fef3e6; color: #e67e22; }
+  .badge-liberado { background: #e8f5e9; color: #27ae60; }
+  .badge-grave { background: #fee; color: #e74c3c; }
+  .badge-leve { background: #e3f2fd; color: #2E75B6; }
+  .badge-media { background: #fef9e7; color: #f39c12; }
+  .badge-pendiente { background: #fff4e6; color: #d35400; }
+ 
+  .action-icons { display: flex; gap: 6px; }
+  .icon-btn {
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #ecf0f1;
+    font-size: 14px;
+  }
+  .icon-btn:hover { background: #d5dbdb; }
+ 
+  .search-box {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px;
+    min-width: 220px;
+  }
+  .filter-chip {
+    background: #ecf0f1;
+    padding: 6px 14px;
+    border-radius: 14px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .filter-chip.active {
+    background: #2E75B6;
+    color: white;
+  }
+ 
+  /* ===== CARDS RESUMEN ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .stat-icon {
+    width: 48px; height: 48px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .stat-icon.red { background: #fee; color: #e74c3c; }
+  .stat-icon.orange { background: #fef3e6; color: #f39c12; }
+  .stat-icon.green { background: #e8f5e9; color: #27ae60; }
+  .stat-icon.blue { background: #e3f2fd; color: #2E75B6; }
+  .stat-icon.purple { background: #f3e8ff; color: #8e44ad; }
+  .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+  .stat-label { font-size: 12px; color: #7f8c8d; }
+ 
+  /* ===== EXPEDIENTE ===== */
+  .alumno-card {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f8fafc 100%);
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border-left: 4px solid #2E75B6;
+  }
+  .alumno-avatar-big {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: #2E75B6;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  .alumno-datos h4 { color: #1F4E79; font-size: 18px; margin-bottom: 6px; }
+  .alumno-datos p { font-size: 13px; color: #34495e; margin: 2px 0; }
+ 
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .info-box {
+    background: #f8fafc;
+    padding: 14px;
+    border-radius: 8px;
+    border-left: 3px solid #2E75B6;
+  }
+  .info-box-label {
+    font-size: 11px;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .info-box-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .info-box.danger { border-left-color: #e74c3c; }
+  .info-box.warning { border-left-color: #f39c12; }
+  .info-box.success { border-left-color: #27ae60; }
+ 
+  /* ===== TIMELINE SEGUIMIENTO ===== */
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 0; bottom: 0;
+    width: 2px;
+    background: #ecf0f1;
+  }
+  .timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -22px;
+    top: 4px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #2E75B6;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #2E75B6;
+  }
+  .timeline-item.done::before { background: #27ae60; box-shadow: 0 0 0 2px #27ae60; }
+  .timeline-item.pending::before { background: #f39c12; box-shadow: 0 0 0 2px #f39c12; }
+  .timeline-date { font-size: 12px; color: #7f8c8d; margin-bottom: 4px; }
+  .timeline-title { font-weight: 600; color: #2c3e50; margin-bottom: 4px; }
+  .timeline-desc { font-size: 13px; color: #34495e; }
+ 
+  /* ===== ETAPA ===== */
+  .etapa-selector {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .etapa-option {
+    flex: 1;
+    padding: 16px;
+    border: 2px solid #ecf0f1;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .etapa-option.active {
+    border-color: #f39c12;
+    background: #fff4e6;
+  }
+  .etapa-option.active.liberado {
+    border-color: #27ae60;
+    background: #e8f5e9;
+  }
+  .etapa-emoji { font-size: 28px; margin-bottom: 6px; }
+  .etapa-name { font-weight: 600; }
+  .etapa-desc { font-size: 11px; color: #7f8c8d; margin-top: 4px; }
+ 
+  /* ===== REPORTES ===== */
+  .report-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+  }
+  .chart-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  }
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 220px;
+    padding: 20px 0;
+    border-bottom: 2px solid #ecf0f1;
+  }
+  .bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .bar {
+    width: 100%;
+    background: linear-gradient(to top, #2E75B6, #5DADE2);
+    border-radius: 6px 6px 0 0;
+    position: relative;
+    transition: all 0.3s;
+  }
+  .bar-value {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .bar-label {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #7f8c8d;
+  }
+  .legend {
+    display: flex;
+    gap: 14px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+  }
+  .legend-color {
+    width: 14px; height: 14px;
+    border-radius: 3px;
+  }
+ 
+  .pie-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .pie {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: conic-gradient(
+      #e74c3c 0% 25%,
+      #f39c12 25% 55%,
+      #27ae60 55% 85%,
+      #2E75B6 85% 100%
+    );
+    position: relative;
+  }
+  .pie::after {
+    content: '';
+    position: absolute;
+    inset: 40px;
+    background: white;
+    border-radius: 50%;
+  }
+ 
+  /* ===== SECCIONES TÍTULO ===== */
+  h3.section-title {
+    font-size: 15px;
+    color: #1F4E79;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #2E75B6;
+  }
+ 
+  .empty-note {
+    text-align: center;
+    padding: 40px 20px;
+    color: #95a5a6;
+    font-size: 13px;
+  }
+ 
+  /* ===== CALENDARIO ===== */
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-top: 16px;
+  }
+  .cal-head {
+    background: #f8fafc;
+    padding: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7f8c8d;
+    text-transform: uppercase;
+  }
+  .cal-day {
+    background: white;
+    border: 1px solid #ecf0f1;
+    padding: 10px 6px;
+    min-height: 70px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .cal-day:hover { background: #f8fafc; }
+  .cal-day.today {
+    background: #e3f2fd;
+    border-color: #2E75B6;
+    font-weight: bold;
+  }
+  .cal-day.has-event { background: #fff4e6; }
+  .cal-event {
+    font-size: 10px;
+    background: #e67e22;
+    color: white;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cal-event.blue { background: #2E75B6; }
+  .cal-event.green { background: #27ae60; }
+</style>
+</head>
+<body>
+ 
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      SIGIE
+      <div style="font-size:11px; font-weight:normal; opacity:0.8;">Sistema de Gestión de Incidentes Escolares</div>
+    </div>
+  </div>
+  <div class="user-info">
+    <span class="user-role">👩‍⚕️ Enfermería</span>
+    <div style="text-align:right;">
+      <div style="font-weight:600; font-size:14px;">María López</div>
+      <div style="font-size:11px; opacity:0.8;">Enfermera Escolar</div>
+    </div>
+    <div class="user-avatar">ML</div>
+    <button class="btn-logout">Cerrar sesión</button>
+  </div>
+</div>
+ 
+<div class="container">
+ 
+  <!-- ===== SIDEBAR ===== -->
+  <div class="sidebar">
+    <div class="sidebar-title">Menú Principal</div>
+    <div class="menu-item" onclick="show('panel')"><span class="menu-icon">📊</span> Panel principal</div>
+    <div class="menu-item" onclick="show('registrar')"><span class="menu-icon">📝</span> Registrar incidencia</div>
+    <div class="menu-item" onclick="show('consultar')"><span class="menu-icon">🔍</span> Consultar incidencias</div>
+    <div class="menu-item" onclick="show('expediente')"><span class="menu-icon">📋</span> Expedientes médicos</div>
+    <div class="menu-item" onclick="show('seguimiento')"><span class="menu-icon">🔄</span> Seguimiento</div>
+    <div class="menu-item" onclick="show('intervencion')"><span class="menu-icon">🚑</span> Intervenciones externas</div>
+    <div class="sidebar-title" style="margin-top:20px;">Otros</div>
+    <div class="menu-item" onclick="show('agendar')"><span class="menu-icon">📅</span> Agendar reunión</div>
+    <div class="menu-item" onclick="show('historial')"><span class="menu-icon">📜</span> Historial</div>
+    <div class="menu-item" onclick="show('reportes')"><span class="menu-icon">📈</span> Reportes</div>
+  </div>
+ 
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+ 
+    <!-- SELECTOR RÁPIDO PARA VER TODOS LOS PANELES -->
+    <div class="panel-selector">
+      <strong>Ver panel:</strong>
+      <span class="panel-tab active" onclick="show('panel')">📊 Principal</span>
+      <span class="panel-tab" onclick="show('registrar')">📝 Registrar</span>
+      <span class="panel-tab" onclick="show('consultar')">🔍 Consultar</span>
+      <span class="panel-tab" onclick="show('expediente')">📋 Expediente</span>
+      <span class="panel-tab" onclick="show('seguimiento')">🔄 Seguimiento</span>
+      <span class="panel-tab" onclick="show('intervencion')">🚑 Intervención</span>
+      <span class="panel-tab" onclick="show('agendar')">📅 Agendar</span>
+      <span class="panel-tab" onclick="show('historial')">📜 Historial</span>
+      <span class="panel-tab" onclick="show('reportes')">📈 Reportes</span>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 1: PRINCIPAL         -->
+    <!-- ========================= -->
+    <div class="panel-content active" id="panel">
+      <div class="breadcrumb">Inicio / Panel de Enfermería</div>
+      <h1 class="page-title">Bienvenida, María 👋</h1>
+      <p class="page-subtitle">Resumen del día — miércoles 23 de abril de 2026</p>
+ 
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon red">🚨</div><div><div class="stat-number">3</div><div class="stat-label">Incidencias hoy</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">⏳</div><div><div class="stat-number">5</div><div class="stat-label">En Proceso</div></div></div>
+        <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-number">12</div><div class="stat-label">Liberadas este mes</div></div></div>
+        <div class="stat-card"><div class="stat-icon blue">🏥</div><div><div class="stat-number">2</div><div class="stat-label">Con intervención externa</div></div></div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📑 Incidencias recientes</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span class="filter-chip active">Todas</span>
+            <span class="filter-chip">En Proceso</span>
+            <span class="filter-chip">Liberadas</span>
+            <input class="search-box" placeholder="🔍 Buscar alumno o folio...">
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Folio</th><th>Alumno</th><th>Grupo</th><th>Tipo</th><th>Gravedad</th><th>Fecha</th><th>Etapa</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr><td class="folio">INC-0453</td><td><strong>Diego Ramírez</strong></td><td>3°A</td><td>Caída en patio</td><td><span class="badge badge-media">Media</span></td><td>23/04/2026 10:15</td><td><span class="badge badge-proceso">● En Proceso</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button><button class="icon-btn">📧</button></div></td></tr>
+            <tr><td class="folio">INC-0452</td><td><strong>Sofía Martínez</strong></td><td>5°B</td><td>Fiebre</td><td><span class="badge badge-leve">Leve</span></td><td>23/04/2026 09:42</td><td><span class="badge badge-liberado">● Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button><button class="icon-btn">📧</button></div></td></tr>
+            <tr><td class="folio">INC-0451</td><td><strong>Luis Hernández</strong></td><td>2°C</td><td>Corte en mano</td><td><span class="badge badge-grave">Grave</span></td><td>23/04/2026 08:30</td><td><span class="badge badge-proceso">● En Proceso</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button><button class="icon-btn">📧</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 2: REGISTRAR         -->
+    <!-- ========================= -->
+    <div class="panel-content" id="registrar">
+      <div class="breadcrumb">Inicio / Registrar incidencia</div>
+      <h1 class="page-title">📝 Registrar nueva incidencia</h1>
+      <p class="page-subtitle">Complete el formulario para registrar un nuevo incidente. Los campos marcados con <span style="color:#e74c3c;">*</span> son obligatorios.</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🩺 Datos del incidente</div>
+          <span class="badge badge-pendiente">Nuevo registro</span>
+        </div>
+        <div class="card-body">
+ 
+          <h3 class="section-title">👦 Datos del alumno</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nombre del alumno <span class="req">*</span></label>
+              <input class="form-input" placeholder="Ej. Diego Ramírez López" value="Diego Ramírez López">
+              <div class="form-help">El sistema autocompleta al escribir el nombre</div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grupo <span class="req">*</span></label>
+              <select class="form-select">
+                <option>Seleccione grupo</option>
+                <option>1°A</option><option>2°A</option>
+                <option selected>3°A</option>
+                <option>4°A</option><option>5°A</option><option>6°A</option>
+              </select>
+            </div>
+          </div>
+ 
+          <h3 class="section-title" style="margin-top:20px;">📋 Detalles del incidente</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tipo de incidencia <span class="req">*</span></label>
+              <select class="form-select">
+                <option>Seleccione tipo</option>
+                <option selected>Caída</option>
+                <option>Golpe</option><option>Corte / Herida</option>
+                <option>Fiebre</option><option>Desmayo</option>
+                <option>Reacción alérgica</option><option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nivel de gravedad <span class="req">*</span></label>
+              <select class="form-select">
+                <option>Seleccione gravedad</option>
+                <option>Leve</option>
+                <option selected>Media</option>
+                <option>Grave</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha <span class="req">*</span></label>
+              <input class="form-input" type="date" value="2026-04-23">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora <span class="req">*</span></label>
+              <input class="form-input" type="time" value="10:15">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Lugar del incidente</label>
+              <input class="form-input" placeholder="Ej. Patio principal, salón 12, cancha..." value="Patio principal">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Descripción del incidente <span class="req">*</span></label>
+              <textarea class="form-textarea" placeholder="Describa lo ocurrido con detalle...">El alumno sufrió una caída durante el recreo al correr en el patio principal. Presenta raspón en la rodilla derecha sin sangrado abundante.</textarea>
+            </div>
+          </div>
+ 
+          <h3 class="section-title" style="margin-top:20px;">🏥 Valoración médica inicial</h3>
+          <div class="form-grid">
+            <div class="form-group form-grid-full">
+              <label class="form-label">Síntomas observados</label>
+              <textarea class="form-textarea" placeholder="Raspón, inflamación, dolor..." style="min-height:70px;">Raspón superficial, ligera inflamación, dolor al movimiento.</textarea>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Atención brindada</label>
+              <textarea class="form-textarea" placeholder="Curación, aplicación de hielo, reposo..." style="min-height:70px;">Limpieza con suero fisiológico, aplicación de antiséptico y vendaje. Reposo en enfermería.</textarea>
+            </div>
+          </div>
+ 
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-secondary">Guardar borrador</button>
+            <button class="btn btn-primary">💾 Registrar incidencia</button>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 3: CONSULTAR         -->
+    <!-- ========================= -->
+    <div class="panel-content" id="consultar">
+      <div class="breadcrumb">Inicio / Consultar incidencias</div>
+      <h1 class="page-title">🔍 Consultar incidencias</h1>
+      <p class="page-subtitle">Filtra y consulta los incidentes registrados en el sistema</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎯 Filtros de búsqueda</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Buscar por alumno o folio</label>
+              <input class="form-input" placeholder="Ej. Diego Ramírez o INC-0453">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grupo</label>
+              <select class="form-select"><option>Todos</option><option>3°A</option><option>5°B</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de incidencia</label>
+              <select class="form-select"><option>Todos</option><option>Caída</option><option>Fiebre</option><option>Golpe</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gravedad</label>
+              <select class="form-select"><option>Todas</option><option>Leve</option><option>Media</option><option>Grave</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Desde</label>
+              <input class="form-input" type="date" value="2026-04-01">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hasta</label>
+              <input class="form-input" type="date" value="2026-04-23">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Etapa</label>
+              <select class="form-select"><option>Todas</option><option>En Proceso</option><option>Liberado</option></select>
+            </div>
+            <div class="form-group" style="display:flex; align-items:flex-end; gap:8px;">
+              <button class="btn btn-primary" style="flex:1;">🔍 Buscar</button>
+              <button class="btn btn-secondary">Limpiar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📑 Resultados (8 incidencias)</div>
+          <div><button class="btn btn-secondary">📥 Exportar Excel</button> <button class="btn btn-secondary">📄 Exportar PDF</button></div>
+        </div>
+        <table>
+          <thead><tr><th>Folio</th><th>Alumno</th><th>Grupo</th><th>Tipo</th><th>Gravedad</th><th>Fecha</th><th>Etapa</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr><td class="folio">INC-0453</td><td><strong>Diego Ramírez</strong></td><td>3°A</td><td>Caída</td><td><span class="badge badge-media">Media</span></td><td>23/04/2026</td><td><span class="badge badge-proceso">En Proceso</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0452</td><td><strong>Sofía Martínez</strong></td><td>5°B</td><td>Fiebre</td><td><span class="badge badge-leve">Leve</span></td><td>23/04/2026</td><td><span class="badge badge-liberado">Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0451</td><td><strong>Luis Hernández</strong></td><td>2°C</td><td>Corte</td><td><span class="badge badge-grave">Grave</span></td><td>23/04/2026</td><td><span class="badge badge-proceso">En Proceso</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0450</td><td><strong>Ana García</strong></td><td>4°A</td><td>Dolor de cabeza</td><td><span class="badge badge-leve">Leve</span></td><td>22/04/2026</td><td><span class="badge badge-liberado">Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0449</td><td><strong>Pedro Torres</strong></td><td>6°B</td><td>Golpe</td><td><span class="badge badge-media">Media</span></td><td>22/04/2026</td><td><span class="badge badge-proceso">En Proceso</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0448</td><td><strong>María Flores</strong></td><td>1°A</td><td>Caída</td><td><span class="badge badge-leve">Leve</span></td><td>21/04/2026</td><td><span class="badge badge-liberado">Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0447</td><td><strong>Juan Pérez</strong></td><td>3°B</td><td>Alergia</td><td><span class="badge badge-grave">Grave</span></td><td>20/04/2026</td><td><span class="badge badge-liberado">Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+            <tr><td class="folio">INC-0446</td><td><strong>Carla Ruiz</strong></td><td>4°C</td><td>Fiebre</td><td><span class="badge badge-leve">Leve</span></td><td>19/04/2026</td><td><span class="badge badge-liberado">Liberado</span></td><td><div class="action-icons"><button class="icon-btn">👁️</button><button class="icon-btn">✏️</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 4: EXPEDIENTE MÉDICO -->
+    <!-- ========================= -->
+    <div class="panel-content" id="expediente">
+      <div class="breadcrumb">Inicio / Expedientes médicos</div>
+      <h1 class="page-title">📋 Expediente médico del alumno</h1>
+      <p class="page-subtitle">Información clínica completa del estudiante</p>
+ 
+      <div class="card">
+        <div class="card-body">
+          <div style="display:flex; gap:10px; margin-bottom:16px;">
+            <input class="form-input" placeholder="🔍 Buscar alumno por nombre, grupo o matrícula..." style="flex:1;">
+            <button class="btn btn-primary">Buscar</button>
+          </div>
+ 
+          <div class="alumno-card">
+            <div class="alumno-avatar-big">DR</div>
+            <div class="alumno-datos" style="flex:1;">
+              <h4>Diego Ramírez López</h4>
+              <p>🎓 <strong>Matrícula:</strong> 2024-0453 &nbsp;|&nbsp; 📚 <strong>Grupo:</strong> 3°A</p>
+              <p>🎂 <strong>Edad:</strong> 8 años &nbsp;|&nbsp; <strong>Nacimiento:</strong> 12/03/2018</p>
+              <p>👨‍👩‍👧 <strong>Tutor:</strong> Luis Ramírez Gómez &nbsp;|&nbsp; 📞 833-123-4567</p>
+              <p>📧 luis.ramirez@correo.com &nbsp;|&nbsp; 🏠 Av. Reforma 124, Col. Centro</p>
+            </div>
+            <button class="btn btn-primary">✏️ Editar</button>
+          </div>
+ 
+          <h3 class="section-title">🩺 Datos médicos</h3>
+          <div class="info-grid">
+            <div class="info-box"><div class="info-box-label">Tipo de sangre</div><div class="info-box-value">O+</div></div>
+            <div class="info-box danger"><div class="info-box-label">⚠️ Alergias</div><div class="info-box-value">Penicilina, Polen</div></div>
+            <div class="info-box warning"><div class="info-box-label">Padecimientos</div><div class="info-box-value">Asma leve</div></div>
+            <div class="info-box"><div class="info-box-label">Medicamentos</div><div class="info-box-value">Salbutamol (inhalador)</div></div>
+            <div class="info-box success"><div class="info-box-label">Vacunas al día</div><div class="info-box-value">✅ Sí</div></div>
+            <div class="info-box"><div class="info-box-label">Seguro médico</div><div class="info-box-value">IMSS</div></div>
+          </div>
+ 
+          <h3 class="section-title" style="margin-top:24px;">📞 Contactos de emergencia</h3>
+          <div class="info-grid">
+            <div class="info-box"><div class="info-box-label">Primario</div><div class="info-box-value">Luis Ramírez · 833-123-4567</div></div>
+            <div class="info-box"><div class="info-box-label">Secundario</div><div class="info-box-value">Ana López · 833-987-6543</div></div>
+            <div class="info-box"><div class="info-box-label">Médico particular</div><div class="info-box-value">Dr. Pérez · 833-555-1212</div></div>
+          </div>
+ 
+          <h3 class="section-title" style="margin-top:24px;">📅 Incidencias recientes del alumno</h3>
+          <table>
+            <thead><tr><th>Folio</th><th>Fecha</th><th>Tipo</th><th>Gravedad</th><th>Etapa</th></tr></thead>
+            <tbody>
+              <tr><td class="folio">INC-0453</td><td>23/04/2026</td><td>Caída en patio</td><td><span class="badge badge-media">Media</span></td><td><span class="badge badge-proceso">En Proceso</span></td></tr>
+              <tr><td class="folio">INC-0421</td><td>15/03/2026</td><td>Crisis asmática</td><td><span class="badge badge-grave">Grave</span></td><td><span class="badge badge-liberado">Liberado</span></td></tr>
+              <tr><td class="folio">INC-0389</td><td>10/02/2026</td><td>Raspón</td><td><span class="badge badge-leve">Leve</span></td><td><span class="badge badge-liberado">Liberado</span></td></tr>
+              <tr><td class="folio">INC-0312</td><td>05/12/2025</td><td>Fiebre</td><td><span class="badge badge-leve">Leve</span></td><td><span class="badge badge-liberado">Liberado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 5: SEGUIMIENTO       -->
+    <!-- ========================= -->
+    <div class="panel-content" id="seguimiento">
+      <div class="breadcrumb">Inicio / Seguimiento</div>
+      <h1 class="page-title">🔄 Seguimiento de incidencia</h1>
+      <p class="page-subtitle">Folio: <strong>INC-0453</strong> · Diego Ramírez López · 3°A</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📍 Etapa actual de la incidencia</div>
+        </div>
+        <div class="card-body">
+          <div class="etapa-selector">
+            <div class="etapa-option active">
+              <div class="etapa-emoji">⏳</div>
+              <div class="etapa-name">En Proceso</div>
+              <div class="etapa-desc">Incidencia activa y en atención</div>
+            </div>
+            <div class="etapa-option liberado">
+              <div class="etapa-emoji">✅</div>
+              <div class="etapa-name">Liberado</div>
+              <div class="etapa-desc">Alumno recuperado y dado de alta</div>
+            </div>
+          </div>
+ 
+          <div class="form-group">
+            <label class="form-label">Motivo del cambio de etapa</label>
+            <textarea class="form-textarea" placeholder="Explica por qué se cambia la etapa..." style="min-height:70px;"></textarea>
+          </div>
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px;">
+              <input type="checkbox" checked> Notificar al tutor sobre este cambio
+            </label>
+          </div>
+          <button class="btn btn-success">💾 Actualizar etapa</button>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Registrar nueva acción de seguimiento</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tipo de acción <span class="req">*</span></label>
+              <select class="form-select">
+                <option>Reunión con padres</option><option>Sanción</option>
+                <option>Derivación médica</option><option>Atención de enfermería</option>
+                <option>Observación</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Responsable <span class="req">*</span></label>
+              <input class="form-input" value="María López (Enfermera)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha de seguimiento</label>
+              <input class="form-input" type="date" value="2026-04-23">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Estado</label>
+              <select class="form-select"><option>Pendiente</option><option>En curso</option><option>Cumplido</option></select>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-textarea" placeholder="Describe la acción realizada o a realizar..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary">➕ Agregar seguimiento</button>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🕒 Línea de tiempo del seguimiento</div>
+        </div>
+        <div class="card-body">
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-date">23/04/2026 - 11:30</div>
+              <div class="timeline-title">⏳ Observación en enfermería</div>
+              <div class="timeline-desc">Alumno en reposo. Se monitorea por 30 min. Responsable: María López</div>
+            </div>
+            <div class="timeline-item done">
+              <div class="timeline-date">23/04/2026 - 10:30</div>
+              <div class="timeline-title">✅ Atención de enfermería</div>
+              <div class="timeline-desc">Curación de raspón, aplicación de antiséptico y vendaje. Responsable: María López</div>
+            </div>
+            <div class="timeline-item done">
+              <div class="timeline-date">23/04/2026 - 10:20</div>
+              <div class="timeline-title">✅ Notificación al tutor</div>
+              <div class="timeline-desc">Correo enviado a luis.ramirez@correo.com. Estado: Entregado</div>
+            </div>
+            <div class="timeline-item done">
+              <div class="timeline-date">23/04/2026 - 10:15</div>
+              <div class="timeline-title">📝 Incidencia registrada</div>
+              <div class="timeline-desc">Folio INC-0453 creado. Responsable: María López</div>
+            </div>
+            <div class="timeline-item pending">
+              <div class="timeline-date">24/04/2026 - 10:00 (programado)</div>
+              <div class="timeline-title">📅 Reunión con tutor</div>
+              <div class="timeline-desc">Pendiente · Reunión virtual para revisar protocolo de seguridad</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 6: INTERVENCIÓN      -->
+    <!-- ========================= -->
+    <div class="panel-content" id="intervencion">
+      <div class="breadcrumb">Inicio / Intervenciones externas</div>
+      <h1 class="page-title">🚑 Intervenciones externas</h1>
+      <p class="page-subtitle">Registra apoyo externo durante un incidente: IMSS, ambulancia, policía, protección civil</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">➕ Registrar nueva intervención</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Folio de incidencia vinculada <span class="req">*</span></label>
+              <input class="form-input" value="INC-0451" placeholder="Ej. INC-0451">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de intervención <span class="req">*</span></label>
+              <select class="form-select">
+                <option>Servicios médicos (IMSS)</option>
+                <option>Ambulancia privada</option>
+                <option>Cruz Roja</option>
+                <option>Policía</option>
+                <option>Protección Civil</option>
+                <option>Bomberos</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Entidad / Institución <span class="req">*</span></label>
+              <input class="form-input" placeholder="Ej. IMSS Clínica 13">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora de solicitud</label>
+              <input class="form-input" type="time">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Número de reporte</label>
+              <input class="form-input" placeholder="Folio externo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contacto de seguimiento</label>
+              <input class="form-input" placeholder="Teléfono / correo">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-textarea" placeholder="Describe la intervención..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary">💾 Registrar intervención</button>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 Intervenciones externas registradas</div>
+        </div>
+        <table>
+          <thead><tr><th>Folio INC</th><th>Alumno</th><th>Tipo</th><th>Entidad</th><th>Hora</th><th>Reporte</th><th>Contacto</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td class="folio">INC-0451</td><td>Luis Hernández</td><td>Ambulancia</td><td>Cruz Roja</td><td>08:45</td><td>CR-2026-0091</td><td>833-111-2222</td><td><button class="icon-btn">👁️</button></td></tr>
+            <tr><td class="folio">INC-0421</td><td>Diego Ramírez</td><td>IMSS</td><td>Clínica 13</td><td>11:20</td><td>IMSS-00445</td><td>833-444-5555</td><td><button class="icon-btn">👁️</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 7: AGENDAR           -->
+    <!-- ========================= -->
+    <div class="panel-content" id="agendar">
+      <div class="breadcrumb">Inicio / Agendar reunión</div>
+      <h1 class="page-title">📅 Programar sesión de seguimiento</h1>
+      <p class="page-subtitle">Agenda reuniones con padres, docentes u orientadores</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">➕ Nueva reunión</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Incidencia vinculada</label>
+              <input class="form-input" value="INC-0453 - Diego Ramírez">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo de reunión</label>
+              <select class="form-select"><option>Presencial</option><option>Virtual (Videollamada)</option><option>Telefónica</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha</label>
+              <input class="form-input" type="date" value="2026-04-24">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hora</label>
+              <input class="form-input" type="time" value="10:00">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Participantes</label>
+              <input class="form-input" placeholder="Correos separados por coma" value="luis.ramirez@correo.com, director@sigie.edu.mx">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Asunto / Motivo</label>
+              <textarea class="form-textarea" placeholder="Describe el motivo...">Seguimiento de incidente — revisión del protocolo y valoración médica actualizada</textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary">📧 Agendar y enviar invitaciones</button>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🗓️ Calendario · Abril 2026</div>
+        </div>
+        <div class="card-body">
+          <div class="calendar">
+            <div class="cal-head">LUN</div><div class="cal-head">MAR</div><div class="cal-head">MIÉ</div><div class="cal-head">JUE</div><div class="cal-head">VIE</div><div class="cal-head">SÁB</div><div class="cal-head">DOM</div>
+            <div class="cal-day">20</div>
+            <div class="cal-day has-event">21<div class="cal-event blue">Reunión director</div></div>
+            <div class="cal-day">22</div>
+            <div class="cal-day today">23<div class="cal-event">Revisión INC-0453</div></div>
+            <div class="cal-day has-event">24<div class="cal-event">Reunión tutor Diego</div></div>
+            <div class="cal-day">25</div>
+            <div class="cal-day">26</div>
+            <div class="cal-day">27</div>
+            <div class="cal-day has-event">28<div class="cal-event green">Simulacro</div></div>
+            <div class="cal-day">29</div>
+            <div class="cal-day has-event">30<div class="cal-event blue">Junta mensual</div></div>
+            <div class="cal-day">1</div><div class="cal-day">2</div><div class="cal-day">3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 8: HISTORIAL         -->
+    <!-- ========================= -->
+    <div class="panel-content" id="historial">
+      <div class="breadcrumb">Inicio / Historial</div>
+      <h1 class="page-title">📜 Historial de incidentes</h1>
+      <p class="page-subtitle">Consulta el historial completo por alumno con filtros y exportación</p>
+ 
+      <div class="card">
+        <div class="card-body">
+          <div style="display:flex; gap:10px; margin-bottom:16px;">
+            <input class="form-input" placeholder="🔍 Nombre del alumno..." style="flex:1;" value="Diego Ramírez López">
+            <select class="form-select" style="width:160px;"><option>Todo el año</option><option>Últimos 30 días</option><option>Últimos 90 días</option></select>
+            <button class="btn btn-primary">Buscar</button>
+            <button class="btn btn-secondary">📥 Exportar</button>
+          </div>
+ 
+          <div class="alumno-card" style="padding:14px;">
+            <div class="alumno-avatar-big" style="width:60px;height:60px;font-size:20px;">DR</div>
+            <div class="alumno-datos">
+              <h4>Diego Ramírez López · 3°A</h4>
+              <p>📊 <strong>Total de incidencias:</strong> 4 &nbsp;|&nbsp; <strong>Último ingreso:</strong> 23/04/2026</p>
+              <p>⚠️ <strong>Incidencias graves:</strong> 1 &nbsp;|&nbsp; <strong>Con intervención externa:</strong> 1</p>
+            </div>
+          </div>
+ 
+          <table>
+            <thead><tr><th>Folio</th><th>Fecha</th><th>Tipo</th><th>Gravedad</th><th>Descripción</th><th>Etapa</th><th>Seguimiento</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="folio">INC-0453</td><td>23/04/2026</td>
+                <td>Caída en patio</td>
+                <td><span class="badge badge-media">Media</span></td>
+                <td>Raspón en rodilla durante recreo</td>
+                <td><span class="badge badge-proceso">En Proceso</span></td>
+                <td>2 acciones</td>
+              </tr>
+              <tr>
+                <td class="folio">INC-0421</td><td>15/03/2026</td>
+                <td>Crisis asmática</td>
+                <td><span class="badge badge-grave">Grave</span></td>
+                <td>Crisis durante clase de educación física, se solicitó IMSS</td>
+                <td><span class="badge badge-liberado">Liberado</span></td>
+                <td>5 acciones</td>
+              </tr>
+              <tr>
+                <td class="folio">INC-0389</td><td>10/02/2026</td>
+                <td>Raspón</td>
+                <td><span class="badge badge-leve">Leve</span></td>
+                <td>Raspón en mano por caída en escaleras</td>
+                <td><span class="badge badge-liberado">Liberado</span></td>
+                <td>1 acción</td>
+              </tr>
+              <tr>
+                <td class="folio">INC-0312</td><td>05/12/2025</td>
+                <td>Fiebre</td>
+                <td><span class="badge badge-leve">Leve</span></td>
+                <td>Fiebre de 38.2°C, se envió a casa</td>
+                <td><span class="badge badge-liberado">Liberado</span></td>
+                <td>2 acciones</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ========================= -->
+    <!-- PANEL 9: REPORTES          -->
+    <!-- ========================= -->
+    <div class="panel-content" id="reportes">
+      <div class="breadcrumb">Inicio / Reportes</div>
+      <h1 class="page-title">📈 Reportes y estadísticas</h1>
+      <p class="page-subtitle">Visualización de datos sobre incidencias por período, grupo y tipo</p>
+ 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🎯 Generar reporte</div>
+        </div>
+        <div class="card-body">
+          <div class="form-grid" style="grid-template-columns: repeat(4, 1fr);">
+            <div class="form-group">
+              <label class="form-label">Período</label>
+              <select class="form-select"><option>Mensual</option><option>Bimestral</option><option>Semestral</option><option>Anual</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Agrupar por</label>
+              <select class="form-select"><option>Grupo</option><option>Grado</option><option>Tipo</option><option>Gravedad</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Formato</label>
+              <select class="form-select"><option>PDF</option><option>Excel</option></select>
+            </div>
+            <div class="form-group" style="display:flex;align-items:flex-end;">
+              <button class="btn btn-primary" style="width:100%;">📄 Generar reporte</button>
+            </div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon blue">📊</div><div><div class="stat-number">47</div><div class="stat-label">Total del mes</div></div></div>
+        <div class="stat-card"><div class="stat-icon red">⚠️</div><div><div class="stat-number">8</div><div class="stat-label">Graves</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">📈</div><div><div class="stat-number">+12%</div><div class="stat-label">vs mes anterior</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">👥</div><div><div class="stat-number">32</div><div class="stat-label">Alumnos distintos</div></div></div>
+      </div>
+ 
+      <div class="report-grid">
+        <div class="chart-box">
+          <h3 class="section-title">📊 Incidencias por mes (2026)</h3>
+          <div class="bar-chart">
+            <div class="bar-item"><div class="bar" style="height:45%;"><div class="bar-value">18</div></div><div class="bar-label">Ene</div></div>
+            <div class="bar-item"><div class="bar" style="height:60%;"><div class="bar-value">24</div></div><div class="bar-label">Feb</div></div>
+            <div class="bar-item"><div class="bar" style="height:72%;"><div class="bar-value">29</div></div><div class="bar-label">Mar</div></div>
+            <div class="bar-item"><div class="bar" style="height:95%;"><div class="bar-value">47</div></div><div class="bar-label">Abr</div></div>
+            <div class="bar-item"><div class="bar" style="height:30%;opacity:0.4;"><div class="bar-value">-</div></div><div class="bar-label">May</div></div>
+            <div class="bar-item"><div class="bar" style="height:30%;opacity:0.4;"><div class="bar-value">-</div></div><div class="bar-label">Jun</div></div>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-color" style="background:#2E75B6;"></div> Incidencias registradas</div>
+          </div>
+        </div>
+ 
+        <div class="chart-box">
+          <h3 class="section-title">🥧 Distribución por gravedad</h3>
+          <div class="pie-wrapper"><div class="pie"></div></div>
+          <div class="legend" style="flex-direction:column; gap:8px;">
+            <div class="legend-item"><div class="legend-color" style="background:#e74c3c;"></div> Grave (25%)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#f39c12;"></div> Media (30%)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#27ae60;"></div> Leve (30%)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#2E75B6;"></div> Sin clasificar (15%)</div>
+          </div>
+        </div>
+      </div>
+ 
+      <div class="card" style="margin-top:20px;">
+        <div class="card-header">
+          <div class="card-title">🏆 Ranking por grupo (abril 2026)</div>
+        </div>
+        <table>
+          <thead><tr><th>Pos.</th><th>Grupo</th><th>Total incidencias</th><th>Leves</th><th>Medias</th><th>Graves</th><th>Tendencia</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>3°A</td><td>9</td><td>5</td><td>3</td><td>1</td><td style="color:#e74c3c;">📈 +3</td></tr>
+            <tr><td><strong>2</strong></td><td>5°B</td><td>7</td><td>4</td><td>2</td><td>1</td><td style="color:#f39c12;">📈 +1</td></tr>
+            <tr><td><strong>3</strong></td><td>2°C</td><td>6</td><td>3</td><td>2</td><td>1</td><td style="color:#27ae60;">📉 -2</td></tr>
+            <tr><td><strong>4</strong></td><td>4°A</td><td>5</td><td>3</td><td>2</td><td>0</td><td style="color:#95a5a6;">= 0</td></tr>
+            <tr><td><strong>5</strong></td><td>6°B</td><td>4</td><td>2</td><td>1</td><td>1</td><td style="color:#27ae60;">📉 -1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+ 
+  </div>
+</div>
+ 
+<script>
+function show(id) {
+  document.querySelectorAll('.panel-content').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.panel-tab').forEach(el => el.classList.remove('active'));
+  event.target.classList.add('active');
+  document.querySelectorAll('.sidebar .menu-item').forEach(el => el.classList.remove('active'));
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+ 
+</body>
+</html>

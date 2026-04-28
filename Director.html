@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SIGIE - Panel del Director</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f4f8; color: #2c3e50; }
+
+  .header {
+    background: linear-gradient(135deg, #4a148c 0%, #7b1fa2 100%);
+    color: white; padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: bold; }
+  .logo-icon {
+    background: white; color: #4a148c;
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  }
+  .user-info { display: flex; align-items: center; gap: 14px; }
+  .user-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #6a1b9a; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px;
+  }
+  .user-role { background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 12px; font-size: 12px; }
+  .btn-logout {
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+
+  .container { display: flex; min-height: calc(100vh - 70px); }
+  .sidebar { width: 240px; background: #2c3e50; color: white; padding: 20px 0; flex-shrink: 0; }
+  .sidebar-title { padding: 0 20px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #95a5a6; }
+  .menu-item {
+    padding: 12px 20px; cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; border-left: 3px solid transparent; color: #ecf0f1;
+  }
+  .menu-item:hover { background: #34495e; }
+  .menu-item.active { background: #34495e; border-left-color: #7b1fa2; color: #ba68c8; font-weight: 600; }
+  .menu-icon { font-size: 18px; width: 22px; text-align: center; }
+
+  .main { flex: 1; padding: 28px; }
+  .breadcrumb { font-size: 13px; color: #7f8c8d; margin-bottom: 8px; }
+  .page-title { font-size: 26px; color: #4a148c; margin-bottom: 4px; }
+  .page-subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 24px; }
+
+  .panel-selector {
+    background: white; padding: 16px 24px; border-radius: 10px;
+    margin-bottom: 24px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .panel-selector strong { color: #4a148c; margin-right: 8px; }
+  .panel-tab { padding: 8px 14px; border-radius: 20px; background: #ecf0f1; cursor: pointer; font-size: 13px; }
+  .panel-tab.active { background: #7b1fa2; color: white; }
+
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+
+  .card { background: white; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 24px; overflow: hidden; }
+  .card-header { padding: 18px 24px; border-bottom: 1px solid #ecf0f1; display: flex; justify-content: space-between; align-items: center; }
+  .card-title { font-size: 16px; color: #4a148c; font-weight: 600; }
+  .card-body { padding: 24px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid-full { grid-column: 1 / -1; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; font-weight: 600; color: #2c3e50; margin-bottom: 6px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid #dcdfe3; border-radius: 6px; font-size: 14px;
+  }
+  .form-textarea { min-height: 100px; }
+  .form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #ecf0f1; margin-top: 20px; }
+  .btn { padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; }
+  .btn-primary { background: #7b1fa2; color: white; }
+  .btn-warning { background: #f39c12; color: white; }
+  .btn-secondary { background: #ecf0f1; color: #2c3e50; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f8fafc; padding: 12px 16px; text-align: left; font-size: 12px; color: #7f8c8d; font-weight: 600; text-transform: uppercase; border-bottom: 2px solid #ecf0f1; }
+  td { padding: 14px 16px; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+
+  .folio { font-family: 'Courier New', monospace; font-weight: bold; color: #2E75B6; }
+  .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+  .badge-proceso { background: #fef3e6; color: #e67e22; }
+  .badge-liberado { background: #e8f5e9; color: #27ae60; }
+  .badge-grave { background: #fee; color: #e74c3c; }
+  .badge-leve { background: #e3f2fd; color: #2E75B6; }
+  .badge-media { background: #fef9e7; color: #f39c12; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; }
+  .stat-icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .stat-icon.red { background: #fee; color: #e74c3c; }
+  .stat-icon.orange { background: #fef3e6; color: #f39c12; }
+  .stat-icon.blue { background: #e3f2fd; color: #2E75B6; }
+  .stat-icon.purple { background: #f3e8ff; color: #8e44ad; }
+  .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+  .stat-label { font-size: 12px; color: #7f8c8d; }
+
+  .search-box { padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; min-width: 220px; }
+</style>
+</head>
+<body>
+    <div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>SIGIE<div style="font-size:11px;font-weight:normal;opacity:0.8;">Sistema de Gestión de Incidentes Escolares</div></div>
+  </div>
+  <div class="user-info">
+    <span class="user-role">🎓 Director</span>
+    <div style="text-align:right;">
+      <div style="font-weight:600;font-size:14px;">Dr. Roberto Sánchez</div>
+      <div style="font-size:11px;opacity:0.8;">Director General</div>
+    </div>
+    <div class="user-avatar">RS</div>
+    <button class="btn-logout">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="sidebar">
+    <div class="sidebar-title">Dirección</div>
+    <div class="menu-item" onclick="show('dashboard')"><span class="menu-icon">📊</span> Dashboard</div>
+    <div class="menu-item" onclick="show('reportes')"><span class="menu-icon">📈</span> Reportes</div>
+    <div class="menu-item" onclick="show('bitacora')"><span class="menu-icon">📋</span> Bitácora</div>
+    <div class="menu-item" onclick="show('avisos')"><span class="menu-icon">📧</span> Enviar avisos</div>
+  </div>
+
+  <div class="main">
+    <div class="panel-selector">
+      <strong>Ver panel:</strong>
+      <span class="panel-tab active" onclick="show('dashboard')">📊 Dashboard</span>
+      <span class="panel-tab" onclick="show('reportes')">📈 Reportes</span>
+      <span class="panel-tab" onclick="show('bitacora')">📋 Bitácora</span>
+      <span class="panel-tab" onclick="show('avisos')">📧 Avisos</span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="panel-content active" id="dashboard">
+      <div class="breadcrumb">Inicio / Dashboard ejecutivo</div>
+      <h1 class="page-title">Dashboard Directivo 📊</h1>
+      <p class="page-subtitle">Vista consolidada de la institución — Abril 2026</p>
+
+      <div class="stats">
+        <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-number">342</div><div class="stat-label">Alumnos totales</div></div></div>
+        <div class="stat-card"><div class="stat-icon red">⚠️</div><div><div class="stat-number">47</div><div class="stat-label">Incidencias mes</div></div></div>
+        <div class="stat-card"><div class="stat-icon orange">🏥</div><div><div class="stat-number">5</div><div class="stat-label">Graves</div></div></div>
+        <div class="stat-card"><div class="stat-icon purple">📊</div><div><div class="stat-number">+12%</div><div class="stat-label">vs mes ant.</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏆 Ranking de grupos por incidencias</div></div>
+        <table>
+          <thead><tr><th>Pos.</th><th>Grupo</th><th>Docente</th><th>Total</th><th>Graves</th><th>Tendencia</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1</strong></td><td>3°A</td><td>Carlos Jiménez</td><td>9</td><td>1</td><td style="color:#e74c3c;">📈 +3</td></tr>
+            <tr><td><strong>2</strong></td><td>5°B</td><td>Patricia Vega</td><td>7</td><td>1</td><td style="color:#f39c12;">📈 +1</td></tr>
+            <tr><td><strong>3</strong></td><td>2°C</td><td>Mario Ruiz</td><td>6</td><td>1</td><td style="color:#27ae60;">📉 -2</td></tr>
+            <tr><td><strong>4</strong></td><td>4°A</td><td>Lucía Morales</td><td>5</td><td>0</td><td style="color:#95a5a6;">= 0</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🚨 Alertas urgentes (últimas 24h)</div></div>
+        <table>
+          <thead><tr><th>Folio</th><th>Alumno</th><th>Grupo</th><th>Tipo</th><th>Gravedad</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody>
+            <tr><td class="folio">INC-0451</td><td>Luis Hernández</td><td>2°C</td><td>Corte profundo</td><td><span class="badge badge-grave">Grave</span></td><td><span class="badge badge-proceso">En Proceso</span></td><td><button class="btn btn-warning" style="padding:6px 14px;font-size:12px;">Revisar</button></td></tr>
+            <tr><td class="folio">INC-0447</td><td>Juan Pérez</td><td>3°B</td><td>Alergia severa</td><td><span class="badge badge-grave">Grave</span></td><td><span class="badge badge-liberado">Liberado</span></td><td><button class="btn btn-secondary" style="padding:6px 14px;font-size:12px;">Ver</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTES -->
+    <div class="panel-content" id="reportes">
+      <h1 class="page-title">📈 Reportes ejecutivos</h1>
+      <div class="card"><div class="card-body">
+        <div class="form-grid" style="grid-template-columns:repeat(4,1fr);">
+          <div class="form-group"><label class="form-label">Período</label><select class="form-select"><option>Mensual</option><option>Anual</option></select></div>
+          <div class="form-group"><label class="form-label">Agrupar</label><select class="form-select"><option>Grupo</option><option>Tipo</option></select></div>
+          <div class="form-group"><label class="form-label">Formato</label><select class="form-select"><option>PDF</option><option>Excel</option></select></div>
+          <div class="form-group" style="display:flex;align-items:flex-end;"><button class="btn btn-primary" style="width:100%;">📄 Generar</button></div>
+        </div>
+      </div></div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">📊 Reportes recientes</div></div>
+        <table>
+          <thead><tr><th>Nombre</th><th>Tipo</th><th>Período</th><th>Generado</th><th>Descargar</th></tr></thead>
+          <tbody>
+            <tr><td>Reporte mensual abril</td><td>PDF</td><td>Abril 2026</td><td>23/04/2026</td><td><button class="btn btn-secondary" style="padding:6px 12px;">📥</button></td></tr>
+            <tr><td>Análisis por gravedad</td><td>Excel</td><td>Trimestre</td><td>15/04/2026</td><td><button class="btn btn-secondary" style="padding:6px 12px;">📥</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BITÁCORA -->
+    <div class="panel-content" id="bitacora">
+      <h1 class="page-title">📋 Bitácora de seguridad</h1>
+      <p class="page-subtitle">Registro cronológico de eventos de seguridad del plantel</p>
+      <div class="card"><div class="card-body">
+        <div style="display:flex;gap:10px;margin-bottom:16px;">
+          <input class="search-box" placeholder="🔍 Buscar evento..." style="flex:1;">
+          <select class="form-select" style="width:160px;"><option>Todos</option><option>Incidentes</option><option>Simulacros</option></select>
+          <button class="btn btn-primary">Filtrar</button>
+        </div>
+        <table>
+          <thead><tr><th>Fecha/Hora</th><th>Tipo</th><th>Evento</th><th>Responsable</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td>23/04/2026 10:15</td><td><span class="badge badge-media">Incidente</span></td><td>INC-0453 — Caída en patio</td><td>María López</td><td><span class="badge badge-proceso">Activo</span></td></tr>
+            <tr><td>22/04/2026 09:00</td><td><span class="badge badge-leve">Simulacro</span></td><td>Simulacro de sismo</td><td>Protección civil</td><td><span class="badge badge-liberado">Completado</span></td></tr>
+            <tr><td>20/04/2026 11:30</td><td><span class="badge badge-grave">Alerta</span></td><td>Alerta por lluvia</td><td>Dirección</td><td><span class="badge badge-liberado">Cerrado</span></td></tr>
+          </tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- AVISOS -->
+    <div class="panel-content" id="avisos">
+      <h1 class="page-title">📧 Enviar avisos masivos</h1>
+      <div class="card"><div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Destinatarios *</label>
+            <select class="form-select"><option>Todos los padres</option><option>Todos los docentes</option><option>Personal completo</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo de aviso</label>
+            <select class="form-select"><option>Informativo</option><option>Urgente</option><option>Seguridad</option></select>
+          </div>
+          <div class="form-group form-grid-full">
+            <label class="form-label">Asunto *</label>
+            <input class="form-input" placeholder="Ej. Suspensión de clases...">
+          </div>
+          <div class="form-group form-grid-full">
+            <label class="form-label">Mensaje *</label>
+            <textarea class="form-textarea" placeholder="Redacte el aviso..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary">Vista previa</button>
+          <button class="btn btn-primary">📧 Enviar aviso</button>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel-content').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.panel-tab').forEach(el => el.classList.remove('active'));
+  if (event && event.target) event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>

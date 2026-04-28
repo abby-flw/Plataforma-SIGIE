@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>SIGIE - Portal del Tutor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f4f8; color: #2c3e50; }
+
+  .header {
+    background: linear-gradient(135deg, #bf360c 0%, #f4511e 100%);
+    color: white; padding: 14px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: bold; }
+  .logo-icon {
+    background: white; color: #bf360c;
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .user-info { display: flex; align-items: center; gap: 14px; }
+  .user-avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: #d84315; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px;
+  }
+  .user-role {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 10px; border-radius: 12px; font-size: 12px;
+  }
+  .btn-logout {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; font-size: 13px;
+  }
+
+  .container { display: flex; min-height: calc(100vh - 70px); }
+
+  .sidebar {
+    width: 240px; background: #2c3e50;
+    color: white; padding: 20px 0; flex-shrink: 0;
+  }
+  .sidebar-title {
+    padding: 0 20px 12px; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 1px; color: #95a5a6;
+  }
+  .menu-item {
+    padding: 12px 20px; cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+    font-size: 14px; border-left: 3px solid transparent;
+    transition: all 0.2s; color: #ecf0f1;
+  }
+  .menu-item:hover { background: #34495e; }
+  .menu-item.active {
+    background: #34495e; border-left-color: #f4511e;
+    color: #ff8a65; font-weight: 600;
+  }
+  .menu-icon { font-size: 18px; width: 22px; text-align: center; }
+
+  .main { flex: 1; padding: 28px; overflow-y: auto; }
+
+  .breadcrumb { font-size: 13px; color: #7f8c8d; margin-bottom: 8px; }
+  .page-title { font-size: 26px; color: #bf360c; margin-bottom: 4px; }
+  .page-subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 24px; }
+
+  .panel-content { display: none; }
+  .panel-content.active { display: block; }
+
+  .card {
+    background: white; border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    margin-bottom: 24px; overflow: hidden;
+  }
+  .card-header {
+    padding: 18px 24px; border-bottom: 1px solid #ecf0f1;
+    display: flex; justify-content: space-between;
+    align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .card-title { font-size: 16px; color: #bf360c; font-weight: 600; }
+  .card-body { padding: 24px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-grid-full { grid-column: 1 / -1; }
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: #2c3e50; margin-bottom: 6px;
+  }
+  .form-label .req { color: #e74c3c; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid #dcdfe3; border-radius: 6px;
+    font-size: 14px; font-family: inherit;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none; border-color: #f4511e;
+    box-shadow: 0 0 0 3px rgba(244,81,30,0.1);
+  }
+  .form-textarea { min-height: 100px; resize: vertical; }
+  .form-actions {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding-top: 20px; border-top: 1px solid #ecf0f1; margin-top: 20px;
+  }
+
+  .btn {
+    padding: 10px 20px; border-radius: 6px; border: none;
+    cursor: pointer; font-size: 14px; font-weight: 600;
+  }
+  .btn-primary { background: #f4511e; color: white; }
+  .btn-secondary { background: #ecf0f1; color: #2c3e50; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #f8fafc; padding: 12px 16px;
+    text-align: left; font-size: 12px; color: #7f8c8d;
+    font-weight: 600; text-transform: uppercase;
+    border-bottom: 2px solid #ecf0f1;
+  }
+  td { padding: 14px 16px; border-bottom: 1px solid #ecf0f1; font-size: 14px; }
+  tr:hover { background: #f8fafc; }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 16px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: white; padding: 20px; border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    display: flex; align-items: center; gap: 14px;
+  }
+  .stat-icon {
+    width: 48px; height: 48px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .stat-icon.red { background: #fee; color: #e74c3c; }
+  .stat-icon.orange { background: #fef3e6; color: #f39c12; }
+  .stat-icon.blue { background: #e3f2fd; color: #2E75B6; }
+  .stat-icon.green { background: #e8f5e9; color: #27ae60; }
+  .stat-number { font-size: 24px; font-weight: bold; color: #2c3e50; }
+  .stat-label { font-size: 12px; color: #7f8c8d; }
+
+  .tabla-vacia {
+    text-align: center !important;
+    padding: 40px 20px !important;
+    color: #95a5a6 !important;
+    font-size: 14px;
+    font-style: italic;
+  }
+  .tabla-vacia:hover { background: white !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      SIGIE
+      <div style="font-size:11px; font-weight:normal; opacity:0.8;">Portal del Tutor</div>
+    </div>
+  </div>
+  <div class="user-info">
+    <span class="user-role">👨‍👩‍👧 Tutor</span>
+    <div style="text-align:right;">
+      <div style="font-weight:600; font-size:14px;">—</div>
+      <div style="font-size:11px; opacity:0.8;">Sin sesión iniciada</div>
+    </div>
+    <div class="user-avatar">?</div>
+    <button class="btn-logout">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- MENÚ LATERAL -->
+  <div class="sidebar">
+    <div class="sidebar-title">Portal Padres</div>
+    <div class="menu-item active" onclick="show('inicio')"><span class="menu-icon">🏠</span> Inicio</div>
+    <div class="menu-item" onclick="show('hijo')"><span class="menu-icon">👦</span> Mi hijo</div>
+    <div class="menu-item" onclick="show('incidencias')"><span class="menu-icon">📋</span> Incidencias</div>
+    <div class="menu-item" onclick="show('notificaciones')"><span class="menu-icon">🔔</span> Notificaciones</div>
+    <div class="menu-item" onclick="show('reuniones')"><span class="menu-icon">📅</span> Reuniones</div>
+    <div class="sidebar-title" style="margin-top:20px;">Otros</div>
+    <div class="menu-item" onclick="show('documentos')"><span class="menu-icon">📄</span> Documentos</div>
+    <div class="menu-item" onclick="show('contacto')"><span class="menu-icon">📞</span> Contacto</div>
+  </div>
+
+  <div class="main">
+
+    <!-- PANEL 1: INICIO -->
+    <div class="panel-content active" id="inicio">
+      <div class="breadcrumb">Inicio / Panel del Tutor</div>
+      <h1 class="page-title">Bienvenido(a) 👋</h1>
+      <p class="page-subtitle">Panel familiar</p>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-icon red">🚨</div>
+          <div><div class="stat-number">0</div><div class="stat-label">Incidencias activas</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">🔔</div>
+          <div><div class="stat-number">0</div><div class="stat-label">Avisos nuevos</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📅</div>
+          <div><div class="stat-number">0</div><div class="stat-label">Reuniones</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">📄</div>
+          <div><div class="stat-number">0</div><div class="stat-label">Documentos</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">👦 Información del alumno</div></div>
+        <div class="card-body">
+          <p style="text-align:center; color:#95a5a6; padding:20px;">
+            No hay información del alumno registrada.<br>
+            <span style="font-size:12px;">Los datos aparecerán cuando se registre el vínculo familiar.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🚨 Incidencias recientes</div></div>
+        <table>
+          <thead>
+            <tr><th>Folio</th><th>Fecha</th><th>Tipo</th><th>Gravedad</th><th>Etapa</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5" class="tabla-vacia">📭 No hay incidencias recientes.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL 2: MI HIJO -->
+    <div class="panel-content" id="hijo">
+      <div class="breadcrumb">Inicio / Mi hijo</div>
+      <h1 class="page-title">👦 Información de mi hijo</h1>
+      <p class="page-subtitle">Datos generales y médicos del alumno</p>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 Datos generales</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Nombre completo</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Matrícula</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Grupo</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Edad</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Fecha de nacimiento</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Maestro titular</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🩺 Información médica</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tipo de sangre</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Alergias</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Padecimientos</label>
+              <input class="form-input" type="text" placeholder="—" readonly>
+            </div>
+          </div>
+          <div style="margin-top:20px;">
+            <button class="btn btn-primary">✏️ Solicitar actualización</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📞 Contactos de emergencia</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Contacto primario</label>
+              <input class="form-input" type="text" placeholder="—">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono primario</label>
+              <input class="form-input" type="text" placeholder="—">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contacto secundario</label>
+              <input class="form-input" type="text" placeholder="—">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Teléfono secundario</label>
+              <input class="form-input" type="text" placeholder="—">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary">💾 Guardar cambios</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 3: INCIDENCIAS -->
+    <div class="panel-content" id="incidencias">
+      <div class="breadcrumb">Inicio / Incidencias</div>
+      <h1 class="page-title">📋 Historial de incidencias</h1>
+      <p class="page-subtitle">Todas las incidencias registradas de mi hijo(a)</p>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎯 Filtros</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select class="form-select">
+                <option value="">Todos</option>
+                <option>Caída</option>
+                <option>Golpe</option>
+                <option>Fiebre</option>
+                <option>Pelea</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gravedad</label>
+              <select class="form-select">
+                <option value="">Todas</option>
+                <option>Leve</option>
+                <option>Media</option>
+                <option>Grave</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Desde</label>
+              <input class="form-input" type="date">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hasta</label>
+              <input class="form-input" type="date">
+            </div>
+          </div>
+          <button class="btn btn-primary">🔍 Buscar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📑 Resultados</div>
+          <button class="btn btn-secondary">📥 Exportar PDF</button>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Folio</th><th>Fecha</th><th>Tipo</th><th>Gravedad</th><th>Descripción</th><th>Etapa</th><th>Acción</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="7" class="tabla-vacia">📂 No hay incidencias registradas.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL 4: NOTIFICACIONES -->
+    <div class="panel-content" id="notificaciones">
+      <div class="breadcrumb">Inicio / Notificaciones</div>
+      <h1 class="page-title">🔔 Notificaciones y avisos</h1>
+      <p class="page-subtitle">Mensajes recibidos de la institución</p>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📬 Avisos recibidos</div>
+          <div><button class="btn btn-secondary">✓ Marcar todas como leídas</button></div>
+        </div>
+        <div class="card-body">
+          <p style="text-align:center; color:#95a5a6; padding:40px 20px;">
+            🔕 No hay notificaciones nuevas.<br>
+            <span style="font-size:12px;">Las notificaciones aparecerán cuando la escuela envíe avisos.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚙️ Preferencias de notificación</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+                <input type="checkbox" checked>
+                <span>Recibir notificaciones por correo</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+                <input type="checkbox" checked>
+                <span>Notificaciones de incidencias graves</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+                <input type="checkbox">
+                <span>Recordatorios de reuniones</span>
+              </label>
+            </div>
+            <div class="form-group">
+              <label style="display:flex; align-items:center; gap:8px; font-size:14px; cursor:pointer;">
+                <input type="checkbox">
+                <span>Avisos generales de la escuela</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary">💾 Guardar preferencias</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 5: REUNIONES -->
+    <div class="panel-content" id="reuniones">
+      <div class="breadcrumb">Inicio / Reuniones</div>
+      <h1 class="page-title">📅 Mis reuniones</h1>
+      <p class="page-subtitle">Citas programadas con docentes y enfermería</p>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📆 Próximas reuniones</div>
+          <button class="btn btn-primary">➕ Solicitar reunión</button>
+        </div>
+        <div class="card-body">
+          <p style="text-align:center; color:#95a5a6; padding:40px 20px;">
+            📅 No hay reuniones programadas.<br>
+            <span style="font-size:12px;">Cuando la escuela agende una reunión aparecerá aquí.</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📜 Historial de reuniones</div></div>
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Hora</th><th>Modalidad</th><th>Con</th><th>Asunto</th><th>Estado</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="6" class="tabla-vacia">📂 Sin reuniones anteriores.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL 6: DOCUMENTOS -->
+    <div class="panel-content" id="documentos">
+      <div class="breadcrumb">Inicio / Documentos</div>
+      <h1 class="page-title">📄 Documentos</h1>
+      <p class="page-subtitle">Reportes y constancias del alumno</p>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📑 Documentos disponibles</div></div>
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Tipo</th><th>Fecha</th><th>Tamaño</th><th>Acción</th></tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="5" class="tabla-vacia">📂 No hay documentos disponibles.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PANEL 7: CONTACTO -->
+    <div class="panel-content" id="contacto">
+      <div class="breadcrumb">Inicio / Contacto</div>
+      <h1 class="page-title">📞 Contacto con la escuela</h1>
+      <p class="page-subtitle">Envía un mensaje a la institución</p>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">✉️ Nuevo mensaje</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Para <span class="req">*</span></label>
+              <select class="form-select">
+                <option value="">Seleccione destinatario</option>
+                <option>Dirección</option>
+                <option>Maestro titular</option>
+                <option>Enfermería</option>
+                <option>Administración</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tipo <span class="req">*</span></label>
+              <select class="form-select">
+                <option value="">Seleccione tipo</option>
+                <option>Consulta general</option>
+                <option>Solicitud de reunión</option>
+                <option>Reporte de problema</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Asunto <span class="req">*</span></label>
+              <input class="form-input" type="text" placeholder="Asunto del mensaje...">
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">Mensaje <span class="req">*</span></label>
+              <textarea class="form-textarea" placeholder="Escriba su mensaje..."></textarea>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary">Cancelar</button>
+            <button class="btn btn-primary">📧 Enviar mensaje</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">📞 Información de contacto de la escuela</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">📧 Correo</label>
+              <input class="form-input" type="text" value="contacto@escuela.edu.mx" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">📞 Teléfono</label>
+              <input class="form-input" type="text" value="833-000-0000" readonly>
+            </div>
+            <div class="form-group form-grid-full">
+              <label class="form-label">📍 Dirección</label>
+              <input class="form-input" type="text" value="Calle Principal #123, Cd. Madero, Tamaulipas" readonly>
+            </div>
+            <div class="form-group">
+              <label class="form-label">🕐 Horario de atención</label>
+              <input class="form-input" type="text" value="Lunes a Viernes 8:00 - 14:00" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel-content').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+  if (event && event.target) {
+    event.target.closest('.menu-item').classList.add('active');
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+
+</body>
+</html>
